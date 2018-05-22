@@ -15,7 +15,7 @@ import javax.ws.rs.core.Response;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
-@Path("/users")
+@Path("/token")
 public class TokenGenerator {
 
 	@GET

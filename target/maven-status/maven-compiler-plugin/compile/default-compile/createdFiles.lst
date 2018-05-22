@@ -1,4 +1,9 @@
+com\retailpos\security\SecurityFilter.class
+com\retailpos\model\User.class
+com\retailpos\dao\TestDa.class
+com\retailpos\dao\UserDao.class
 com\retailpos\security\Security.class
 com\retailpos\controller\TokenGenerator.class
-com\retailpos\security\SecurityFilter.class
 com\retailpos\controller\Test.class
+com\retailpos\controller\Users.class
+com\retailpos\service\UserService.class
