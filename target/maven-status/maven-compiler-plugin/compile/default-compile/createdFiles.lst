@@ -6,4 +6,5 @@ com\retailpos\security\Security.class
 com\retailpos\controller\TokenGenerator.class
 com\retailpos\controller\Test.class
 com\retailpos\controller\Users.class
+com\retailpos\model\Role.class
 com\retailpos\service\UserService.class

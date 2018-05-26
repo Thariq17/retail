@@ -9,41 +9,51 @@ import java.util.Date;
 import javax.crypto.KeyGenerator;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.retailpos.dao.UserDao;
+import com.retailpos.model.User;
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 @Path("/token")
 public class TokenGenerator {
 
-	@GET
+	@Autowired
+	UserDao dao;
+
+	@POST
 	@Path("/login")
-	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public Response authenticateUser() {
-		try {
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response authenticateUser(User user) throws Exception {
 
-			// Authenticate the user using the credentials provided
-			// want to write login service here
-			// authenticate(login, password);
-
-			// Issue a token for the user
-			String token = issueToken("retailpos","admin");
-
+		// Authenticate the user using the credentials provided
+		User u = dao.authenticate(user.getUsername(), user.getPassword(), user.getLocation());
+		Boolean authencate = BCrypt.checkpw(user.getPassword(), u.getPassword());
+		
+		// Issue a token for the user
+		if (authencate) {
+			String token = issueToken("retailpos", u.getUsername(), u.getRole().getRole());
 			// Return the token on the response
 			return Response.ok().header("AUTHORIZATION", "Bearer " + token).build();
-
-		} catch (Exception e) {
-			return Response.status(500).build();
+		} else {
+			throw new Exception("Password id wrong");
 		}
+
 	}
 
-	private String issueToken(String subject,String username) throws NoSuchAlgorithmException {
+	private String issueToken(String subject, String username, String role) throws NoSuchAlgorithmException {
 		Key key = KeyGenerator.getInstance("AES").generateKey();
-		String jwtToken = Jwts.builder().setSubject(subject).claim("role", "admin").claim("username",username)
-				// .setIssuer(uriInfo.getAbsolutePath().toString())
-				.setIssuedAt(CurrentDate()).setExpiration(addFifteenMin(CurrentDate()))
+		String jwtToken = Jwts.builder().setSubject(subject).claim("role", "admin").claim("username", username)
+		// .setIssuer(uriInfo.getAbsolutePath().toString())
+				.claim("role", role).setIssuedAt(CurrentDate()).setExpiration(addFifteenMin(CurrentDate()))
 				.signWith(SignatureAlgorithm.HS512, key).compact();
 		return jwtToken;
 

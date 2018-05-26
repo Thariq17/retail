@@ -1,11 +1,18 @@
 package com.retailpos.model;
 
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+
 
 @Entity
 @Table(name = "users")
@@ -33,6 +40,10 @@ public class User {
 
 	@Column(name = "updated_at")
 	private Long updatedAt;
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "role_id", referencedColumnName = "id")
+	private Role role;
 
 	public int getId() {
 		return id;
@@ -89,4 +100,23 @@ public class User {
 	public void setLocation(String location) {
 		this.location = location;
 	}
+
+	public Role getRole() {
+		return role;
+	}
+
+	public void setRole(Role role) {
+		this.role = role;
+	}
+
+	public void merge(User existingUser, User newUser) {
+		if(newUser.getUsername()!=null){
+			existingUser.setUsername(newUser.getUsername());
+		}
+		if(newUser.getPassword()!=null){
+			existingUser.setPassword(newUser.getPassword());
+		}
+		
+	}
+
 }
