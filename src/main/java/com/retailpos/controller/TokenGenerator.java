@@ -37,10 +37,10 @@ public class TokenGenerator {
 		// Authenticate the user using the credentials provided
 		User u = dao.authenticate(user.getUsername(), user.getPassword(), user.getLocation());
 		Boolean authencate = BCrypt.checkpw(user.getPassword(), u.getPassword());
-		
+
 		// Issue a token for the user
 		if (authencate) {
-			String token = issueToken("retailpos", u.getUsername(), u.getRole().getRole());
+			String token = issueToken("retailpos", u.getUsername(), u.getLocation(), u.getRole().getRole());
 			// Return the token on the response
 			return Response.ok().header("AUTHORIZATION", "Bearer " + token).build();
 		} else {
@@ -49,12 +49,13 @@ public class TokenGenerator {
 
 	}
 
-	private String issueToken(String subject, String username, String role) throws NoSuchAlgorithmException {
+	private String issueToken(String subject, String username, String location, String role)
+			throws NoSuchAlgorithmException {
 		Key key = KeyGenerator.getInstance("AES").generateKey();
-		String jwtToken = Jwts.builder().setSubject(subject).claim("role", "admin").claim("username", username)
-		// .setIssuer(uriInfo.getAbsolutePath().toString())
-				.claim("role", role).setIssuedAt(CurrentDate()).setExpiration(addFifteenMin(CurrentDate()))
-				.signWith(SignatureAlgorithm.HS512, key).compact();
+		String jwtToken = Jwts.builder().setSubject(subject).claim("username", username)
+				// .setIssuer(uriInfo.getAbsolutePath().toString())
+				.claim("location", location).claim("role", role).setIssuedAt(CurrentDate())
+				.setExpiration(addFifteenMin(CurrentDate())).signWith(SignatureAlgorithm.HS512, key).compact();
 		return jwtToken;
 
 	}
